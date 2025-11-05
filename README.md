@@ -9,6 +9,6 @@ A smart NLP tool that extracts technical skills from PDF resumes using spaCy and
 - Results export to CSV
 
 ## Usage
-1. Upload PDF resumes to Kaggle
-2. Run the notebook
+1. Upload PDF resumes
+2. Run the code
 3. Download results
