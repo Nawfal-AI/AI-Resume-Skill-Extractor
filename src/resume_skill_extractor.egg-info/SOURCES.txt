@@ -1,0 +1,14 @@
+README.md
+pyproject.toml
+src/resume_skill_extractor/__init__.py
+src/resume_skill_extractor/extractor.py
+src/resume_skill_extractor/logging_config.py
+src/resume_skill_extractor/matcher.py
+src/resume_skill_extractor/skills_db.json
+src/resume_skill_extractor.egg-info/PKG-INFO
+src/resume_skill_extractor.egg-info/SOURCES.txt
+src/resume_skill_extractor.egg-info/dependency_links.txt
+src/resume_skill_extractor.egg-info/requires.txt
+src/resume_skill_extractor.egg-info/top_level.txt
+tests/test_extractor.py
+tests/test_matcher.py
