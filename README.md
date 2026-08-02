@@ -1,6 +1,3 @@
-🔗 Live demo: https://your-app-name.streamlit.app
-
-
 # AI Resume Skill Extractor
 
 An NLP tool that extracts technical skills from PDF resumes and scores how
