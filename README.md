@@ -1,6 +1,6 @@
 # AI Resume Skill Extractor
 
-[![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://nawfal-ai-ai-resume-skill-extractor.streamlit.app)
+[![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://ai-resume-skill-extractor-gn3vunbkqhxscyiyrbydee.streamlit.app)
 [![CI](https://github.com/Nawfal-AI/AI-Resume-Skill-Extractor/actions/workflows/ci.yml/badge.svg)](https://github.com/Nawfal-AI/AI-Resume-Skill-Extractor/actions)
 
 > **Live demo → https://nawfal-ai-ai-resume-skill-extractor.streamlit.app**
@@ -95,7 +95,7 @@ This app is deployed for free on [Streamlit Community Cloud](https://streamlit.i
 1. Connected GitHub repo → Streamlit Cloud reads `requirements.txt` and runs `streamlit run app.py`
 2. Every `git push` to `main` triggers an automatic redeploy (continuous deployment)
 3. No server management, no Docker needed on the cloud side
-4. Live at: **https://nawfal-ai-ai-resume-skill-extractor.streamlit.app**
+4. Live at: **https://ai-resume-skill-extractor-gn3vunbkqhxscyiyrbydee.streamlit.app**
 
 ## What changed from the original notebook
 
