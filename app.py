@@ -10,12 +10,8 @@ Streamlit Community Cloud deployment:
   - No secrets or environment variables required
   - Push to main branch → auto-redeploy
 """
-import io
 import subprocess
 import sys
-
-import pandas as pd
-import streamlit as st
 
 # ── Ensure spaCy model is available (belt-and-suspenders for cloud deploy) ──
 def _ensure_spacy_model():
