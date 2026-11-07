@@ -1,46 +1,24 @@
 """
 Dashboard entrypoint. Run with: streamlit run app.py
-
-Deliberately thin -- all real logic lives in the resume_skill_extractor
-package so it can be tested without spinning up Streamlit, and so a future
-API (FastAPI, etc.) could reuse the exact same extractor/matcher calls.
-
-Streamlit Community Cloud deployment:
-  - requirements.txt handles all dependencies including the spaCy model wheel
-  - No secrets or environment variables required
-  - Push to main branch → auto-redeploy
+Deployed on Streamlit Community Cloud (regex-only mode, no spaCy).
 """
-import subprocess
-import sys
+import io
 
-# ── Ensure spaCy model is available (belt-and-suspenders for cloud deploy) ──
-def _ensure_spacy_model():
-    try:
-        import spacy
-        spacy.load("en_core_web_sm")
-    except OSError:
-        subprocess.run(
-            [sys.executable, "-m", "spacy", "download", "en_core_web_sm"],
-            check=False,
-            capture_output=True,
-        )
+import pandas as pd
+import streamlit as st
 
-_ensure_spacy_model()
-
-from resume_skill_extractor.extractor import ResumeSkillExtractor, PDFExtractionError  # noqa: E402
-from resume_skill_extractor.logging_config import configure_logging  # noqa: E402
-from resume_skill_extractor.matcher import match_resume_to_jd  # noqa: E402
+from resume_skill_extractor.extractor import ResumeSkillExtractor, PDFExtractionError
+from resume_skill_extractor.logging_config import configure_logging
+from resume_skill_extractor.matcher import match_resume_to_jd
 
 configure_logging()
 
-# ── Page config ──────────────────────────────────────────────────────────────
 st.set_page_config(
     page_title="AI Resume Skill Extractor",
     page_icon="🔍",
     layout="wide",
 )
 
-# ── Header ───────────────────────────────────────────────────────────────────
 st.title("🔍 AI Resume Skill Extractor")
 st.caption(
     "Upload a resume PDF and paste a job description — get a skill overlap score, "
@@ -49,21 +27,12 @@ st.caption(
 
 st.divider()
 
-# ── Extractor (cached so the spaCy model loads once per session) ─────────────
 @st.cache_resource
 def get_extractor() -> ResumeSkillExtractor:
     return ResumeSkillExtractor()
 
 extractor = get_extractor()
 
-if not extractor._has_spacy:
-    st.info(
-        "Running in regex-only mode (spaCy model unavailable) — "
-        "results are still accurate for the built-in skill taxonomy.",
-        icon="ℹ️",
-    )
-
-# ── Inputs ───────────────────────────────────────────────────────────────────
 col1, col2 = st.columns(2)
 
 with col1:
@@ -84,12 +53,10 @@ with col2:
         placeholder="Paste the full job description here…",
     )
     if jd_text:
-        word_count = len(jd_text.split())
-        st.caption(f"{word_count} words")
+        st.caption(f"{len(jd_text.split())} words")
 
 st.divider()
 
-# ── Sample resume shortcut ────────────────────────────────────────────────────
 with st.expander("📄 Try a sample resume instead of uploading"):
     sample_choice = st.selectbox(
         "Choose a sample",
@@ -99,16 +66,11 @@ with st.expander("📄 Try a sample resume instead of uploading"):
         "Computer Science Student": "sample_resumes/computer-science-student-resume-example.pdf",
         "Senior CV Scientist": "sample_resumes/senior-computer-vision-scientist-resume-example.pdf",
     }
-    if sample_choice != "— select —":
-        st.info(f"Sample selected: **{sample_choice}**. Click Analyze below.")
 
-# ── Analyze button ────────────────────────────────────────────────────────────
 input_ready = (resume_file or sample_choice != "— select —") and bool(jd_text.strip())
 run = st.button("Analyze ▶", type="primary", disabled=not input_ready)
 
-# ── Analysis ──────────────────────────────────────────────────────────────────
 if run:
-    # Resolve PDF source
     if resume_file:
         pdf_source = io.BytesIO(resume_file.read())
         source_label = resume_file.name
@@ -126,7 +88,6 @@ if run:
         categorized = extractor.extract_skills_hybrid(resume_text)
         result = match_resume_to_jd(resume_text, jd_text, extractor)
 
-    # ── Metrics row ──────────────────────────────────────────────────────────
     st.subheader(f"Results — {source_label}")
     total_skills = sum(len(v) for v in categorized.values())
 
@@ -137,8 +98,6 @@ if run:
     m4.metric("Missing skills flagged", len(result.missing_skills))
 
     st.divider()
-
-    # ── Detail columns ───────────────────────────────────────────────────────
     left, right = st.columns(2)
 
     with left:
@@ -160,7 +119,6 @@ if run:
 
     with right:
         st.subheader("Job description gap analysis")
-
         st.write(f"**✅ Matched skills ({len(result.matched_skills)})**")
         if result.matched_skills:
             st.write(", ".join(result.matched_skills))
@@ -173,7 +131,6 @@ if run:
         else:
             st.success("No gaps detected against the built-in taxonomy.")
 
-    # ── Download ─────────────────────────────────────────────────────────────
     st.divider()
     if not df.empty:
         csv = df.to_csv(index=False).encode("utf-8")
@@ -184,10 +141,9 @@ if run:
             "text/csv",
         )
 
-# ── Footer ────────────────────────────────────────────────────────────────────
 st.divider()
 st.caption(
     "Built by [Nawfal Abdul Malick](https://linkedin.com/in/nawfal-abdul-malick) · "
     "[GitHub](https://github.com/Nawfal-AI/AI-Resume-Skill-Extractor) · "
-    "Powered by spaCy + scikit-learn · Deployed on Streamlit Community Cloud"
+    "Powered by scikit-learn · Deployed on Streamlit Community Cloud"
 )
